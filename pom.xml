@@ -17,6 +17,8 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <nexus.username>yassine</nexus.username>
+        <nexus.password>Pwd12345678.</nexus.password>
     </properties>
 
     <dependencies>

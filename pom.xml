@@ -91,12 +91,18 @@
         <finalName>docker-spring-boot</finalName>
     </build>
     <distributionManagement>
-
-
         <repository>
-            <id>deploymentRepo</id>
-            <name>Nexus Repository</name>
+            <id>deploymentRepo</id> <!-- This should match the server ID -->
             <url>http://nexus:8081/repository/maven-snapshots/</url>
         </repository>
     </distributionManagement>
+    <profiles>
+        <profile>
+            <id>nexus</id>
+            <properties>
+                <username>yassine</username>
+                <password>Pwd12345678.</password>
+            </properties>
+        </profile>
+    </profiles>
 </project>

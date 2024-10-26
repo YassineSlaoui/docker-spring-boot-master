@@ -113,7 +113,7 @@ pipeline {
                     sh 'terraform validate'
 
                     // Apply the configuration changes
-                    sh 'terraform apply -auto-approve'
+                    sh 'terraform -chdir=terraform apply -auto-approve'
                 }
             }
         }

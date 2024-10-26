@@ -5,7 +5,7 @@ pipeline {
         sonarCredential = 'sonarqube_credentials'
         awsCredentialsId = 'aws_credentials'
 
-        clusterName = 'myKubernetesCluster'
+        clusterName = 'mykubernetes'
         region = 'us-east-1'
     }
 
@@ -113,7 +113,7 @@ pipeline {
                     sh 'terraform -chdir=terraform validate'
 
                     // Apply the configuration changes
-                    sh 'terraform -chdir=terraform apply -auto-approve'
+                    sh 'terraform -chdir=terraform apply -auto-approve -var aws_region=${region} -var cluster_name=${clusterName}'
                 }
             }
         }

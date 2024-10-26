@@ -120,11 +120,11 @@ pipeline {
                         echo "Retrieved Role ARN: ${env.ROLE_ARN}"
 
                         // Retrieve VPC ID
-                        env.VPC_ID = sh(script: "aws ec2 describe-vpcs --query 'Vpcs[0].VpcId' --output text", returnStdout: true).trim()
+                        env.VPC_ID = sh(script: "aws ec2 describe-vpcs --region ${region} --query 'Vpcs[0].VpcId' --output text", returnStdout: true).trim()
                         echo "Retrieved VPC ID: ${env.VPC_ID}"
 
                         // Retrieve Subnet IDs
-                        def subnetIds = sh(script: "aws ec2 describe-subnets --query 'Subnets[0:2].SubnetId' --output text", returnStdout: true).trim().split()
+                        def subnetIds = sh(script: "aws ec2 describe-subnets --filters Name=vpc-id,Values=${env.VPC_ID} --query 'Subnets[0:2].SubnetId' --output text", returnStdout: true).trim().split()
                         env.SUBNET_ID_A = subnetIds[0]
                         env.SUBNET_ID_B = subnetIds[1]
                         echo "Retrieved Subnet IDs: ${env.SUBNET_ID_A}, ${env.SUBNET_ID_B}"

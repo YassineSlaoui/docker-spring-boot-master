@@ -103,6 +103,36 @@ pipeline {
             }
         }
 
+        stage('Retrieve AWS Resources') {
+            steps {
+                withCredentials([file(credentialsId: awsCredentialsId, variable: 'AWS_CREDENTIALS_FILE')]) {
+                    script {
+                        def awsCredentials = readFile(AWS_CREDENTIALS_FILE).trim().split("\n")
+                        env.AWS_ACCESS_KEY_ID = awsCredentials.find { it.startsWith("aws_access_key_id") }.split("=")[1].trim()
+                        env.AWS_SECRET_ACCESS_KEY = awsCredentials.find { it.startsWith("aws_secret_access_key") }.split("=")[1].trim()
+                        env.AWS_SESSION_TOKEN = awsCredentials.find { it.startsWith("aws_session_token") }?.split("=")[1]?.trim()
+
+                        echo "AWS Access Key ID: ${env.AWS_ACCESS_KEY_ID}"
+                        echo "AWS Credentials File Loaded"
+
+                        // Retrieve role_arn
+                        env.ROLE_ARN = sh(script: "aws iam list-roles --query 'Roles[?RoleName==`LabRole`].Arn' --output text", returnStdout: true).trim()
+                        echo "Retrieved Role ARN: ${env.ROLE_ARN}"
+
+                        // Retrieve VPC ID
+                        env.VPC_ID = sh(script: "aws ec2 describe-vpcs --query 'Vpcs[0].VpcId' --output text", returnStdout: true).trim()
+                        echo "Retrieved VPC ID: ${env.VPC_ID}"
+
+                        // Retrieve Subnet IDs
+                        def subnetIds = sh(script: "aws ec2 describe-subnets --query 'Subnets[0:2].SubnetId' --output text", returnStdout: true).trim().split()
+                        env.SUBNET_ID_A = subnetIds[0]
+                        env.SUBNET_ID_B = subnetIds[1]
+                        echo "Retrieved Subnet IDs: ${env.SUBNET_ID_A}, ${env.SUBNET_ID_B}"
+                    }
+                }
+            }
+        }
+
         stage('Terraform Setup') {
             steps {
                 script {
@@ -113,7 +143,15 @@ pipeline {
                     sh 'terraform -chdir=terraform validate'
 
                     // Apply the configuration changes
-                    sh 'terraform -chdir=terraform apply -auto-approve -var aws_region=${region} -var cluster_name=${clusterName}'
+                    // sh 'terraform -chdir=terraform apply -auto-approve -var aws_region=${region} -var cluster_name=${clusterName}'
+                    sh """
+                        terraform -chdir=terraform apply -auto-approve \
+                            -var aws_region=${region} \
+                            -var cluster_name=${clusterName} \
+                            -var role_arn=${env.ROLE_ARN} \
+                            -var vpc_id=${env.VPC_ID} \
+                            -var subnet_ids=["${env.SUBNET_ID_A}", "${env.SUBNET_ID_B}"]
+                        """
                 }
             }
         }

@@ -43,6 +43,7 @@ resource "aws_eks_cluster" "my_cluster" {
   version  = "1.30"
 
   vpc_config {
+    vpc_id = var.vpc_id
     subnet_ids         = var.subnet_ids
     security_group_ids = [aws_security_group.eks_cluster_sg.id]
   }

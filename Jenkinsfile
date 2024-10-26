@@ -107,10 +107,10 @@ pipeline {
             steps {
                 script {
                     // Initialize Terraform
-                    sh 'terraform init'
+                    sh 'terraform -chdir=terraform init'
 
                     // Validate Terraform configuration files
-                    sh 'terraform validate'
+                    sh 'terraform -chdir=terraform validate'
 
                     // Apply the configuration changes
                     sh 'terraform -chdir=terraform apply -auto-approve'

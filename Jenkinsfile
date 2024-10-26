@@ -103,21 +103,36 @@ pipeline {
             }
         }
 
-    // New Stage to Deploy on AWS Kubernetes (EKS)
-    stage('Deploy to AWS Kubernetes (EKS)') {
-        steps {
-            script {
-                // Use the kubeconfig securely without string interpolation
-                sh """
-                aws eks update-kubeconfig --region ${region} --name ${clusterName}
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
-                """
+        stage('Terraform Setup') {
+            steps {
+                script {
+                    // Initialize Terraform
+                    sh 'terraform init'
 
+                    // Validate Terraform configuration files
+                    sh 'terraform validate'
+
+                    // Apply the configuration changes
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+
+        // New Stage to Deploy on AWS Kubernetes (EKS)
+        stage('Deploy to AWS Kubernetes (EKS)') {
+            steps {
+                script {
+                    // Use the kubeconfig securely without string interpolation
+                    sh """
+                    aws eks update-kubeconfig --region ${region} --name ${clusterName}
+                    kubectl apply -f deployment.yaml
+                    kubectl apply -f service.yaml
+                    """
+
+                }
             }
         }
     }
-}
 
     post {
         success {

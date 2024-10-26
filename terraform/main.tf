@@ -32,7 +32,7 @@ resource "aws_security_group_rule" "allow_all_inbound_on_30000" {
 
 resource "aws_eks_node_group" "my_node_group" {
   cluster_name    = aws_eks_cluster.my_cluster.name
-  node_group_name = var.cluster_name+"-ng"
+  node_group_name = "${var.cluster_name}-ng"
   node_role_arn   = var.role_arn
   subnet_ids      = var.subnet_ids
 

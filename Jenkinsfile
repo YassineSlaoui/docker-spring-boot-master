@@ -124,7 +124,11 @@ pipeline {
                         echo "Retrieved VPC ID: ${env.VPC_ID}"
 
                         // Retrieve Subnet IDs
-                        def subnetIds = sh(script: "aws ec2 describe-subnets --region ${region} --filters Name=vpc-id,Values=${env.VPC_ID} --query 'Subnets[0:2].SubnetId' --output text", returnStdout: true).trim().split()
+                        def subnetIds = sh(script: """
+                            aws ec2 describe-subnets --region ${region} \
+                            --filters Name=vpc-id,Values=${env.VPC_ID} Name=availability-zone,Values=us-east-1a,us-east-1b \
+                            --query 'Subnets[0:2].SubnetId' --output text
+                        """, returnStdout: true).trim().split()
                         env.SUBNET_ID_A = subnetIds[0]
                         env.SUBNET_ID_B = subnetIds[1]
                         echo "Retrieved Subnet IDs: ${env.SUBNET_ID_A}, ${env.SUBNET_ID_B}"

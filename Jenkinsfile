@@ -149,7 +149,6 @@ pipeline {
                             -var aws_region=${region} \
                             -var cluster_name=${clusterName} \
                             -var role_arn=${env.ROLE_ARN} \
-                            -var vpc_id=${env.VPC_ID} \
                             -var 'subnet_ids=[\"${env.SUBNET_ID_A}\",\"${env.SUBNET_ID_B}\"]'
                     """
                 }

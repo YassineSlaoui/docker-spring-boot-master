@@ -18,4 +18,4 @@ spec:
       - name: my-spring-boot-app
         image: dfcn0/docker-spring-boot:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8083

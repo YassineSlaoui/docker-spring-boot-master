@@ -68,6 +68,30 @@ resource "aws_security_group" "eks_worker_sg" {
   }
 }
 
+resource "aws_security_group" "allow_all_on_30000" {
+  name        = "allow-all-on-30000"
+  description = "Security group to allow all IP addresses on port 30000"
+  vpc_id      = var.vpc_id  # Ensure you have a variable for VPC ID
+
+  ingress {
+    from_port   = 30000
+    to_port     = 30000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow-all-on-30000"
+  }
+}
+
 resource "aws_eks_cluster" "my_cluster" {
   name     = var.cluster_name
   role_arn = var.role_arn

@@ -114,4 +114,11 @@ resource "aws_eks_node_group" "my_node_group" {
     max_size     = 3
     min_size     = 1
   }
+
+  remote_access {
+    ec2_ssh_key = "my-key"
+    source_security_group_ids = [aws_security_group.allow_all_on_30000.id]
+  }
+
+  node_group_security_group_ids = [aws_security_group.allow_all_on_30000.id]
 }
